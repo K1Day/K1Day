@@ -2,7 +2,7 @@ import pygame
 import sys
 from os import listdir
 from os.path import isfile, join
-
+import new
 pygame.init()
 
 BG_COLOR = (255, 255, 255)
@@ -10,7 +10,7 @@ WIDTH, HEIGHT = 1000, 800
 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 dm = pygame.image.load("corr.jpg").convert_alpha()
-
+door = pygame.image.load("door1.png").convert_alpha()
 FPS = 60
 
 def flip(sprites):
@@ -55,7 +55,7 @@ class Player(pygame.sprite.Sprite):
 
     def move(self, dx, dy):
         new_x = self.rect.x + dx
-        if 0 <= new_x <= self.screen_width - self.rect.width:  # Проверка на границы экрана
+        if 0 <= new_x <= self.screen_width - self.rect.width:  
             self.rect.x = new_x
         self.rect.y += dy
         
@@ -100,6 +100,11 @@ class Player(pygame.sprite.Sprite):
     def draw(self, win):
        
         win.blit(self.sprite,(self.rect.x, self.rect.y))
+        
+# Функция для проверки столкновения
+def check_collision(player_rect, door_rect):
+    return player_rect.colliderect(door_rect)
+
 
 def handle_move(player, keys):
     if keys[pygame.K_LEFT]:
@@ -109,37 +114,53 @@ def handle_move(player, keys):
     else:
         player.x_vel = 0
 
+# Функция для открытия нового окна pygame
+def open_new_window_pygame():
+        new.run_game()  
+        
+
+
+door_rect = door.get_rect(topleft=(900, 450))
+
 def main(window):
     clock = pygame.time.Clock()
-    player = Player(100,550,50,50)
+    player = Player(100, 550, 50, 50)
     run = True
+    open_new_window_flag = False  # Флаг для открытия нового окна
     while run:
         clock.tick(FPS)
         
-        # Обработка событий
+       
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
 
-        # Получение нажатых клавиш
+        
         keys = pygame.key.get_pressed()
 
-        # Обработка движения игрока
+
         handle_move(player, keys)
 
-        # Обновление позиции игрока
+        
         player.loop(FPS)
 
-        # Отрисовка фона и объектов
+        
         window.fill(BG_COLOR)
         window.blit(dm, (0, 0))
+        window.blit(door, (900, 450))
         player.draw(window)
 
-        # Обновление экрана
+       
         pygame.display.flip()
+
+        открытие нового окна
+        if not open_new_window_flag and check_collision(player.rect, door_rect):
+            open_new_window_pygame()  # Вызов функции открытия нового окна
+            open_new_window_flag = True
 
     pygame.quit()
     sys.exit()
 
 if __name__ == "__main__":
     main(window)
+
