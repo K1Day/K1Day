@@ -21,7 +21,6 @@ def run_ball():
     pygame.mixer_music.load("assets//song.mp3")
     pygame.mixer_music.play(-1)
 
-
     # Function to check collision between two circles
     def is_collision(x1, y1, r1, x2, y2, r2):
         distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
@@ -71,7 +70,8 @@ def run_ball():
         screen.fill((255, 255, 255))
         
         screen.blit(room, (0,0))
-        screen.blit(phone, (400, 400))
+        if game_state == "running":
+            screen.blit(phone, (400, 400))
         screen.blit(student, (int(x) - student.get_width() // 2, int(y) - student.get_height() // 2))
 
         if game_state == "running":
@@ -102,4 +102,5 @@ def run_ball():
         pygame.display.update()
         clock.tick(60)
 
-
+if __name__ == "__main__":
+    run_ball()
