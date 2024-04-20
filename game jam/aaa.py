@@ -1,18 +1,15 @@
 import pygame
 import sys
+import random
 from os import path
- 
-def run_game():
 
-# Инициализация Pygame
+def run_game():
     pygame.init()
     
-    # Настройки окна
-    WIDTH, HEIGHT = 800, 600
+    WIDTH, HEIGHT = 900, 600
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Sprite Animation")
     
-    # Загрузка ресурсов
     def load_image(name, use_alpha=True):
         fullname = path.join('assets', name)
         image = pygame.image.load(fullname)
@@ -28,8 +25,9 @@ def run_game():
             sprites.append(frame)
         return sprites
     
-    background = load_image("corr.jpg")
-    # Масштабирование фона под размер окна
+    background = load_image("background.png")
+    bdoor = load_image("bdoor.png")
+    book = load_image("book.png")
     background = pygame.transform.scale(background, (WIDTH, HEIGHT))
     
     door = load_image("door1.png")
@@ -37,18 +35,29 @@ def run_game():
     idle_sprites = load_sprite_sheet("idle.png", frame_width, frame_height)
     run_sprites = load_sprite_sheet("run.png", frame_width, frame_height)
     
-    # Параметры игры
     FPS = 60
     clock = pygame.time.Clock()
     
-    # Координаты и скорость персонажа
-    x, y = 100, 450
+    x, y = 100, 350
     x_vel = 0
-    direction = 'right'  # Начальное направление персонажа
+    direction = 'right'
     current_frame = 0
     animation_speed = 0.1
     
-    # Основной игровой цикл
+    # Глобальные переменные для позиции и скорости книги
+    book_x = random.randint(0, WIDTH - frame_width)
+    book_y = 0
+    book_speed = 3
+    score = 0
+    
+    def check_collision(player_x, player_y, book_x, book_y):
+        if (player_x < book_x + book.get_width() and
+            player_x + frame_width > book_x and
+            player_y < book_y + book.get_height() and
+            player_y + frame_height > book_y):
+            return True
+        return False
+    
     running = True
     while running:
         for event in pygame.event.get():
@@ -65,33 +74,48 @@ def run_game():
         else:
             x_vel = 0
     
-        # Обновление позиции персонажа с учетом ограничений экрана
         x += x_vel
         if x > WIDTH - frame_width:
             x = WIDTH - frame_width
         elif x < 0:
             x = 0
     
-        # Отрисовка
-        screen.blit(background, (0, 0))
-        screen.blit(door, (700, 350))  # Позиционирование двери
+        # Генерация случайной позиции книги при её появлении вверху
+        if book_y >= HEIGHT:
+            book_x = random.randint(0, WIDTH - frame_width)
+            book_y = 0
     
-        # Определение и отображение текущего кадра
+        # Обновление позиции книги
+        book_y += book_speed
+    
+        # Проверка на столкновение книги с игроком
+        if check_collision(x, y, book_x, book_y):
+            score += 1
+            # После столкновения генерируем новую позицию книги
+            book_x = random.randint(0, WIDTH - frame_width)
+            book_y = 0
+    
+        screen.blit(background, (0, 0))
+        screen.blit(bdoor, (735, 200))
+        screen.blit(book, (book_x, book_y))
+    
         if x_vel == 0:
             if direction == 'right':
-                screen.blit(idle_sprites[0], (x, y))  # Всегда используем первый кадр для idle
+                screen.blit(idle_sprites[0], (x, y))
             else:
-                # Поворачиваем спрайт idle для направления влево
                 flipped_idle_sprite = pygame.transform.flip(idle_sprites[0], True, False)
                 screen.blit(flipped_idle_sprite, (x, y))
         else:
             current_frame = (current_frame + animation_speed) % len(run_sprites)
             if direction == 'right':
-                screen.blit(run_sprites[int(current_frame)], (x, y))  # Анимация бега вправо
+                screen.blit(run_sprites[int(current_frame)], (x, y))
             else:
-                # Поворачиваем спрайт бега для направления влево
                 flipped_run_sprite = pygame.transform.flip(run_sprites[int(current_frame)], True, False)
                 screen.blit(flipped_run_sprite, (x, y))
+    
+        font = pygame.font.SysFont(None, 36)
+        text = font.render(f"Score: {score}", True, (255, 255, 255))
+        screen.blit(text, (10, 10))
     
         pygame.display.flip()
         clock.tick(FPS)
@@ -99,6 +123,5 @@ def run_game():
     pygame.quit()
     sys.exit()
 
-def close_game():
-    pygame.quit()
-    sys.exit()
+if __name__ == "__main__":
+    run_game()
