@@ -2,7 +2,7 @@ import pygame
 import sys
 import random
 from os import path
-
+ 
 def run_game():
     pygame.init()
     
@@ -27,6 +27,7 @@ def run_game():
     
     background = load_image("background.png")
     bdoor = load_image("bdoor.png")
+    final_image = load_image("final.png")  # Изображение для вывода после столкновения с дверью
     book = load_image("book.png")
     background = pygame.transform.scale(background, (WIDTH, HEIGHT))
     
@@ -49,6 +50,7 @@ def run_game():
     book_y = 0
     book_speed = 3
     score = 0
+    counting_score = True  # Флаг для включения/отключения подсчета счета
     
     def check_collision(player_x, player_y, book_x, book_y):
         if (player_x < book_x + book.get_width() and
@@ -58,7 +60,14 @@ def run_game():
             return True
         return False
     
+    def draw_score():
+        font = pygame.font.Font(None, 36)
+        score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+        screen.blit(score_text, (10, 10))
+    
     running = True
+    show_final_screen = False
+    
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -90,7 +99,8 @@ def run_game():
     
         # Проверка на столкновение книги с игроком
         if check_collision(x, y, book_x, book_y):
-            score += 1
+            if counting_score:
+                score += 1
             # После столкновения генерируем новую позицию книги
             book_x = random.randint(0, WIDTH - frame_width)
             book_y = 0
@@ -113,15 +123,37 @@ def run_game():
                 flipped_run_sprite = pygame.transform.flip(run_sprites[int(current_frame)], True, False)
                 screen.blit(flipped_run_sprite, (x, y))
     
-        font = pygame.font.SysFont(None, 36)
-        text = font.render(f"Score: {score}", True, (255, 255, 255))
-        screen.blit(text, (10, 10))
+        # Проверка на столкновение с изображением bdoor.png
+        if x + frame_width > 735 and y + frame_height > 200:
+            show_final_screen = True
+    
+        if show_final_screen:
+            # Отображаем изображение final.png
+            screen.blit(final_image, (WIDTH // 2 - final_image.get_width() // 2, HEIGHT // 2 - final_image.get_height() // 2))
+            
+            # Отображаем счет и результат (выйграл/провал) в зависимости от счета
+            font = pygame.font.Font(None, 48)
+            score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+            screen.blit(score_text, (WIDTH // 2 - score_text.get_width() // 2, HEIGHT // 2 + 50))
+            
+            if score > 5:
+                result_text = font.render("Выйграл", True, (0, 255, 0))
+            else:
+                result_text = font.render("Провал", True, (255, 0, 0))
+                
+            screen.blit(result_text, (WIDTH // 2 - result_text.get_width() // 2, HEIGHT // 2 + 100))
+            
+            # Останавливаем подсчет счета после отображения final.png
+            counting_score = False
+    
+        # Отображаем счет в углу экрана
+        draw_score()
     
         pygame.display.flip()
         clock.tick(FPS)
-    
+ 
     pygame.quit()
     sys.exit()
-
+ 
 if __name__ == "__main__":
     run_game()
