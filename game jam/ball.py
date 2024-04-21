@@ -109,35 +109,39 @@ def run_ball():
         elif last_direction == "right":
             screen.blit(person_right, (int(x) - person_right.get_width() // 2, int(y) - person_right.get_height() // 2))
 
-        
-     
-        
+        # Check if the timer reaches 0:00 and display the "You're late." message
+        if timer <= 0:
+            font_game_over = pygame.font.SysFont(None, 72)
+            text_game_over = font_game_over.render("You're late.", True, (0, 0, 0))
+            screen.blit(text_game_over, (400, 300))
+            pygame.mixer_music.pause()
+            pygame.display.update()
+            pygame.time.delay(3000)  # Display the message for 3 seconds
+            pygame.quit()
+            exit()
 
-
-
-        if game_state == "running":
-                    if is_collision(x, y, r, 450, 285, note1.get_width() // 2):
-                        note1_picked = True
-                    if is_collision(x, y, r, 880, 370, note2.get_width() // 2):
-                        note2_picked = True
-                    if is_collision(x, y, r, 100, 230, note3.get_width() // 2):
-                        note3_picked = True
+        # Check collision with notes and update note picked flags
+        if game_state == "running" or game_state == "arka_running": # Ensure note collection during arka_running state
+            if is_collision(x, y, r, 450, 285, note1.get_width() // 2):
+                note1_picked = True
+            if is_collision(x, y, r, 880, 370, note2.get_width() // 2):
+                note2_picked = True
+            if is_collision(x, y, r, 100, 230, note3.get_width() // 2):
+                note3_picked = True
         
-            # Check collision with the phone and open a new game if necessary
+        # Check collision with the phone and open a new game if necessary
         if not open_new_game_flag and is_collision(x, y, r, 350, 400, phone.get_width()//2):
-                game_state = "arka_running"
-                open_new_game_flag = True
-                if arka.arka_run(1100, 700):
-                    timer += 300  # Add 5 minutes (300 seconds)
-                    pygame.mixer_music.pause()
-                game_state = "game_over"
+            game_state = "arka_running"
+            open_new_game_flag = True
+            if arka.arka_run(1100, 700):
+                timer += 300  # Add 5 minutes (300 seconds)
+                pygame.mixer_music.pause()
+            game_state = "game_over"
         elif game_state == "game_over":
             # Check collision with the door and open a new game if necessary
             if not open_new_game and is_collision(x, y, r, 830, 160, door.get_width()//2):
-                aaa.run_game()  # Вызываем функцию открытия новой игры
+                aaa.run_game()  # Call the function to open a new game
                 open_new_game = True
-        
-        # Check collision with notes and update note picked flags
         
         # Decrease the timer each frame
         timer -= 0.5
@@ -154,3 +158,4 @@ def run_ball():
 
 if __name__ == "__main__":
     run_ball()
+
