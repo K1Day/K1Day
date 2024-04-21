@@ -137,9 +137,9 @@ def run_game():
             screen.blit(score_text, (WIDTH // 2 - score_text.get_width() // 2, HEIGHT // 2 + 50))
             
             if score > 5:
-                result_text = font.render("Выйграл", True, (0, 255, 0))
+                result_text = font.render("Pass", True, (0, 255, 0))
             else:
-                result_text = font.render("Провал", True, (255, 0, 0))
+                result_text = font.render("Fail", True, (255, 0, 0))
                 
             screen.blit(result_text, (WIDTH // 2 - result_text.get_width() // 2, HEIGHT // 2 + 100))
             
