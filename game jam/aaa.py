@@ -133,15 +133,15 @@ def run_game():
             
             # Отображаем счет и результат (выйграл/провал) в зависимости от счета
             font = pygame.font.Font(None, 48)
-            score_text = font.render(f"Score: {score}", True, (255, 255, 255))
-            screen.blit(score_text, (WIDTH // 2 - score_text.get_width() // 2, HEIGHT // 2 + 50))
+            score_text = font.render(f"Score: {score}", True, (0, 0, 0))
+            screen.blit(score_text, (500, 250))
             
             if score > 5:
                 result_text = font.render("Pass", True, (0, 255, 0))
             else:
                 result_text = font.render("Fail", True, (255, 0, 0))
                 
-            screen.blit(result_text, (WIDTH // 2 - result_text.get_width() // 2, HEIGHT // 2 + 100))
+            screen.blit(result_text, (500, 300))
             
             # Останавливаем подсчет счета после отображения final.png
             counting_score = False
