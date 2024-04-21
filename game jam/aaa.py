@@ -96,7 +96,7 @@ def run_game():
             book_y = 0
     
         screen.blit(background, (0, 0))
-        screen.blit(bdoor, (735, 200))
+        screen.blit(bdoor, (840, 220))
         screen.blit(book, (book_x, book_y))
     
         if x_vel == 0:
