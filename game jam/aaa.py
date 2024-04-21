@@ -124,7 +124,7 @@ def run_game():
                 screen.blit(flipped_run_sprite, (x, y))
     
         # Проверка на столкновение с изображением bdoor.png
-        if x + frame_width > 735 and y + frame_height > 200:
+        if x + frame_width > 840 and y + frame_height > 220:
             show_final_screen = True
     
         if show_final_screen:
